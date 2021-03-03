@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .container{
+        
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="container">contacts</h1>
+
+    <input type="text" id="name">
+    <button id="addDataBtn">Add Data</button>
+    <br><br>
+    <table border="1">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Action</td>
+            </tr>
+        </thead>
+        <tbody id="res"></tbody>
+    </table>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-firestore.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyC2qMJm5_-_4qt6E39sD61_D66dxMgRcig",
+        authDomain: "fire-auth-email-pass.firebaseapp.com",
+        projectId: "fire-auth-email-pass",
+        storageBucket: "fire-auth-email-pass.appspot.com",
+        messagingSenderId: "849722167870",
+        appId: "1:849722167870:web:7aa3871a9deb4b3e0b776f",
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      document.getElementById('addDataBtn').addEventListener('click', addData)
+
+      function addData(){
+          let nameData = document.getElementById('name').value
+
+          firebase.firestore().collection('data').add({
+              name: nameData,
+              timestamp: new Date()
+          }).then(doc=> {
+              console.log(doc.id)
+              alert('Data Added')
+              readData()
+          }).catch(e=>console.log(e))
+      }
+
+      function readData(){
+        document.getElementById('res').innerHTML = ""
+        firebase.firestore().collection('data').get().then(docs=>{
+            docs.forEach(doc=>{
+                document.getElementById('res').innerHTML += `
+                    <tr>
+                        <td>${doc.data().name}</td>
+                        <td>
+                            <button onClick="deleteDoc('${doc.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `
+            })
+        })
+      }
+
+      function deleteDoc(id){
+        //   console.log('Calling')
+        //   console.log(id)
+          if(confirm('Are you Interested?')){
+              firebase.firestore().collection('data').doc(id).delete().then(()=>{
+                  alert('Data Removed')
+                  readData()
+              }).catch(e=>console.log(e))
+          }
+      }
+
+      readData()
+
+    </script>
+  </body>
+</html>
